@@ -103,16 +103,20 @@ export default function Home() {
       setLoading(false);
       if (!image_ref || !image_ref.current) return;
 
-      const img_temp = new Image();
+      /*const img_temp = new HTMLImageElement();
       img_temp.onload = () => {
         setOriginalImageSize({
           x: img_temp.width,
           y: img_temp.height
         });
       }
-      img_temp.src = reader.result as string;
+      img_temp.src = reader.result as string;*/
 
       image_ref.current.onload = () => {
+        setOriginalImageSize({
+          x: (image_ref.current) ? image_ref.current.naturalWidth : 0,
+          y: (image_ref.current) ? image_ref.current.naturalHeight : 0
+        });
         setImageSize({
           x: (image_ref.current) ? image_ref.current.width : 0,
           y: (image_ref.current) ? image_ref.current.height : 0
@@ -143,7 +147,7 @@ export default function Home() {
       // @ts-ignore
       formData?.append(item, JSON.stringify(send_data[item]))
     }
-    fetch("http://localhost:8080/api/gif",{
+    fetch(process.env.API_ENDPOINT as string,{
       method: "POST",
       body: formData
     }).then((res) => res.blob())
@@ -158,9 +162,6 @@ export default function Home() {
       })
     console.log(formData?.get("points"))
   }
-
-  
-  
   
   if (loadingResultGif != null && loadingResultGif) return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Creating GIF</p><LoadingSpinner /></div>
   if (resultGif != "") return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><img className="h-1/2" alt="x" src={resultGif}></img><Button onClick={() => download_gif(resultGif)} className="p-2 m-2 w-1/2 max-w-60">DOWNLOAD</Button></div>
@@ -174,7 +175,7 @@ export default function Home() {
       <div className="relative flex flex-col items-center p-5">
         <div className="max-w-3xl">
           <Canvas size={imageSize} image={previewImageSrc} selectedArr={selectedArr} setSelectedArr={setSelectedArr} />
-          <img hidden={!previewImageSrc} ref={image_ref} src={previewImageSrc as string} alt="" />
+          <img hidden={!previewImageSrc} ref={image_ref} src={previewImageSrc} alt="" />
         </div>
       </div>
       {selectedArr.filter((elem) => elem.x != -1).length == 3 &&

@@ -1,3 +1,5 @@
+"use client"
+
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import X from "./x";
 
@@ -23,16 +25,6 @@ export function Canvas(props: CanvasProps) {
   const zoom_factor = 2.0;
 
   const [mousePos, setMousePos] = useState<Vec2>({x:0,y:0});
-  
-  const [xImg, setXImg] = useState<HTMLImageElement>(new Image());
-
-  useEffect(() => {
-    setXImg(prevXImg => {
-      const img = new Image();
-      img.src = "/x.svg";
-      return img;
-    })
-  }, [])
 
   useEffect(() => {
     const canvas = canvas_ref.current;
@@ -68,9 +60,14 @@ export function Canvas(props: CanvasProps) {
     for (const point of props.selectedArr) {
       if (point.x == -1 || point.y == -1) continue;
       const image_size = 25;
-      ctx.drawImage(xImg, point.x - image_size / 2, point.y - image_size / 2, image_size, image_size);
+      ctx.beginPath();
+      ctx.moveTo(point.x - image_size / 4, point.y - image_size / 4);
+      ctx.lineTo(point.x + image_size / 4, point.y - image_size / 4);
+      ctx.lineTo(point.x, point.y);
+      ctx.fillStyle = '#ff0002';
+      ctx.fill();
     }
-  }, [props.selectedArr, xImg])
+  }, [props.selectedArr])
 
   return (
     <>
