@@ -1,6 +1,7 @@
 "use client"
 
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Button } from "./ui/button";
 import X from "./x";
 
 export type Vec2 = {
@@ -22,9 +23,20 @@ const get_zone = (size: Vec2, point: Vec2) => {
 export function Canvas(props: CanvasProps) {
 
   const canvas_ref = useRef<HTMLCanvasElement>(null);
-  const zoom_factor = 2.0;
+  const preview_window_ref = useRef<HTMLDivElement>(null);
+  const zoom_factor = 3.0;
 
-  const [mousePos, setMousePos] = useState<Vec2>({x:0,y:0});
+  const [mousePos, setMousePos] = useState<Vec2>({x:60,y:60});
+  const [touchStartPos, setTouchStartPos] = useState<Vec2>({x:-1,y:-1});
+
+  const click = (clicked_point: Vec2, canvas: HTMLCanvasElement) => {
+    const zone = get_zone({x: canvas.width, y: canvas.height}, clicked_point);
+    props.setSelectedArr(prevSelectedArr => {
+      const newPoints = [...prevSelectedArr];
+      newPoints[zone] = clicked_point;
+      return newPoints;
+    })
+  }
 
   useEffect(() => {
     const canvas = canvas_ref.current;
@@ -42,12 +54,7 @@ export function Canvas(props: CanvasProps) {
     }
     canvas.onclick = (e: MouseEvent) => {
       const clicked_point: Vec2 = {x: e.offsetX, y: e.offsetY};
-      const zone = get_zone({x: canvas.width, y: canvas.height}, clicked_point);
-      props.setSelectedArr(prevSelectedArr => {
-        const newPoints = [...prevSelectedArr];
-        newPoints[zone] = clicked_point;
-        return newPoints;
-      })
+      click(clicked_point, canvas)
     }
   }, [props, props.selectedArr])
 
@@ -69,16 +76,49 @@ export function Canvas(props: CanvasProps) {
     }
   }, [props.selectedArr])
 
+  const touch_start = (event: any) => {
+    if (!preview_window_ref || !preview_window_ref.current) return;
+    const touch_location = event.targetTouches[0];
+    const offset: Vec2 = {
+      x: touch_location.pageX - preview_window_ref.current.getBoundingClientRect().x,
+      y: touch_location.pageY - preview_window_ref.current.getBoundingClientRect().y
+    }
+    setTouchStartPos({
+      x: touch_location.pageX,
+      y: touch_location.pageY
+    })
+    console.log(offset)
+  }
+
+  const touch_end = (event: any) => {
+
+  }
+
+  const touch_move = (event: any) => {
+    const touch_location = event.targetTouches[0]; 
+    setMousePos(prevMousePos => {
+      return {
+        x: prevMousePos.x + (touchStartPos.x - touch_location.pageX) * 0.15,
+        y: prevMousePos.y + (touchStartPos.y - touch_location.pageY) * 0.15
+      }
+    })
+    setTouchStartPos({
+      x: touch_location.pageX,
+      y: touch_location.pageY
+    })
+  }
+
   return (
     <>
       {(canvas_ref.current && props.image != '') && <div className="pb-3 flex justify-center items-center flex-col">
-        <div className="text-sm max-w-40 text-gray-500">{(mousePos.x + mousePos.y == 0) ? "select point to see zoomed preview" : `(${mousePos.x}, ${mousePos.y})`}</div>
-        <div className="w-40 h-40 overflow-hidden relative">
+        <div className="text-sm max-w-40 text-gray-500 p-1">{(mousePos.x + mousePos.y == 0) ? "select point to see zoomed preview" : `(${mousePos.x.toFixed(0)}, ${mousePos.y.toFixed(0)})`}</div>
+        <div className="w-60 h-60 overflow-hidden relative rounded-md touch-none" ref={preview_window_ref} onTouchStart={touch_start} onTouchEnd={touch_end} onTouchMove={touch_move}>
           <div className="absolute flex justify-center items-center size-full z-30" >
             <X size={25} />
           </div>
-          <img className="absolute z-10" style={{minWidth: `${canvas_ref.current.width * zoom_factor}px`, height: `${canvas_ref.current.height * zoom_factor}px`, top: `${-mousePos.y * zoom_factor + 80}px`, left: `${-mousePos.x * zoom_factor + 80}px`}} src={props.image} alt="" />
+          <img className="absolute z-10" style={{minWidth: `${canvas_ref.current.width * zoom_factor}px`, height: `${canvas_ref.current.height * zoom_factor}px`, top: `${(-mousePos.y * zoom_factor + 120).toFixed(0)}px`, left: `${(-mousePos.x * zoom_factor + 120).toFixed(0)}px`}} src={props.image} alt="" />
         </div>
+        {touchStartPos.x != -1 && <Button className="m-2 w-60" onClick={() => click({x: Math.round(mousePos.x), y: Math.round(mousePos.y)}, canvas_ref.current as HTMLCanvasElement)}>SET POINT</Button>}
       </div>}
       {props.size.x != 0 &&
       <div className="grid grid-cols-3 w-full">
