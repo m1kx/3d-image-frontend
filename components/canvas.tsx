@@ -95,8 +95,8 @@ export function Canvas(props: CanvasProps) {
     const touch_location = event.targetTouches[0]; 
     setMousePos(prevMousePos => {
       return {
-        x: prevMousePos.x + (touchStartPos.x - touch_location.pageX) * 0.15,
-        y: prevMousePos.y + (touchStartPos.y - touch_location.pageY) * 0.15
+        x: prevMousePos.x + (touchStartPos.x - touch_location.pageX) * 0.1,
+        y: prevMousePos.y + (touchStartPos.y - touch_location.pageY) * 0.1
       }
     })
     setTouchStartPos({
@@ -110,9 +110,9 @@ export function Canvas(props: CanvasProps) {
       {(canvas_ref.current && props.image != '') && <div className="pb-3 flex justify-center items-center flex-col">
         Preview Zoom Factor: <b>{zoomFactor}</b>
         <Slider defaultValue={[3]}
-          max={10}
+          max={20}
           min={1}
-          step={1}
+          step={0.1}
           className={cn("w-[100%] p-4")}
           onValueChange={(value: number[]) => {setZoomFactor(value[0])}}
         />
