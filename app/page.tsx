@@ -164,14 +164,14 @@ export default function Home() {
   }
   
   if (loadingResultGif != null && loadingResultGif) return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Creating GIF</p><LoadingSpinner /></div>
-  if (resultGif != "") return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><img className="h-1/2" alt="x" src={resultGif}></img><Button onClick={() => download_gif(resultGif)} className="p-2 m-2 w-1/2 max-w-60">DOWNLOAD</Button></div>
+  if (resultGif != "") return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><img className="h-full" alt="x" src={resultGif}></img><div className="absolute bottom-0 p-3 w-full"><Button onClick={() => download_gif(resultGif)} className="w-full">DOWNLOAD</Button></div></div>
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-5">
       <div className="w-auto">
         {(!loading && previewImageSrc == "") &&<Input type="file" onChange={(e) => setEvent(e)} />}
       </div>
-      {loading ? <>LOADING IMAGE...</>: <></>}
+      {loading && <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Loading Image</p><LoadingSpinner /></div>}
       <div className="relative flex flex-col items-center p-5">
         <div className="max-w-3xl">
           <Canvas size={imageSize} image={previewImageSrc} selectedArr={selectedArr} setSelectedArr={setSelectedArr} />
@@ -179,7 +179,9 @@ export default function Home() {
         </div>
       </div>
       {selectedArr.filter((elem) => elem.x != -1).length == 3 &&
-        <Button className="w-full max-w-3xl" onClick={() => run()}>CREATE GIF</Button>
+        <div className="w-full max-w-3xl pr-5 pl-5">
+          <Button className="w-full" onClick={() => run()}>CREATE GIF</Button>
+        </div>
       }
     </main>
   );

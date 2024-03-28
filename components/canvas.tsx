@@ -1,7 +1,9 @@
 "use client"
 
+import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
+import { Slider } from "./ui/slider";
 import X from "./x";
 
 export type Vec2 = {
@@ -24,7 +26,7 @@ export function Canvas(props: CanvasProps) {
 
   const canvas_ref = useRef<HTMLCanvasElement>(null);
   const preview_window_ref = useRef<HTMLDivElement>(null);
-  const zoom_factor = 3.0;
+  const [zoomFactor, setZoomFactor] = useState<number>(3.0);
 
   const [mousePos, setMousePos] = useState<Vec2>({x:60,y:60});
   const [touchStartPos, setTouchStartPos] = useState<Vec2>({x:-1,y:-1});
@@ -87,11 +89,6 @@ export function Canvas(props: CanvasProps) {
       x: touch_location.pageX,
       y: touch_location.pageY
     })
-    console.log(offset)
-  }
-
-  const touch_end = (event: any) => {
-
   }
 
   const touch_move = (event: any) => {
@@ -111,12 +108,20 @@ export function Canvas(props: CanvasProps) {
   return (
     <>
       {(canvas_ref.current && props.image != '') && <div className="pb-3 flex justify-center items-center flex-col">
+        Preview Zoom Factor: <b>{zoomFactor}</b>
+        <Slider defaultValue={[3]}
+          max={10}
+          min={1}
+          step={1}
+          className={cn("w-[100%] p-4")}
+          onValueChange={(value: number[]) => {setZoomFactor(value[0])}}
+        />
         <div className="text-sm max-w-40 text-gray-500 p-1">{(mousePos.x + mousePos.y == 0) ? "select point to see zoomed preview" : `(${mousePos.x.toFixed(0)}, ${mousePos.y.toFixed(0)})`}</div>
-        <div className="w-60 h-60 overflow-hidden relative rounded-md touch-none" ref={preview_window_ref} onTouchStart={touch_start} onTouchEnd={touch_end} onTouchMove={touch_move}>
+        <div className="w-60 h-60 overflow-hidden relative rounded-md touch-none" ref={preview_window_ref} onTouchStart={touch_start} onTouchMove={touch_move}>
           <div className="absolute flex justify-center items-center size-full z-30" >
             <X size={25} />
           </div>
-          <img className="absolute z-10" style={{minWidth: `${canvas_ref.current.width * zoom_factor}px`, height: `${canvas_ref.current.height * zoom_factor}px`, top: `${(-mousePos.y * zoom_factor + 120).toFixed(0)}px`, left: `${(-mousePos.x * zoom_factor + 120).toFixed(0)}px`}} src={props.image} alt="" />
+          <img className="absolute z-10" style={{minWidth: `${props.size.x * zoomFactor}px`, height: `${props.size.y * zoomFactor}px`, top: `${(-mousePos.y * zoomFactor + 120).toFixed(0)}px`, left: `${(-mousePos.x * zoomFactor + 120).toFixed(0)}px`}} src={props.image} alt="" />
         </div>
         {touchStartPos.x != -1 && <Button className="m-2 w-60" onClick={() => click({x: Math.round(mousePos.x), y: Math.round(mousePos.y)}, canvas_ref.current as HTMLCanvasElement)}>SET POINT</Button>}
       </div>}
