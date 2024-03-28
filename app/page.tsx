@@ -160,7 +160,6 @@ export default function Home() {
       }).then(() => {
         console.log(resultGif)
       })
-    console.log(formData?.get("points"))
   }
   
   if (loadingResultGif != null && loadingResultGif) return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Creating GIF</p><LoadingSpinner /></div>
@@ -172,7 +171,7 @@ export default function Home() {
         {(!loading && previewImageSrc == "") &&<Input type="file" onChange={(e) => setEvent(e)} />}
       </div>
       {loading && <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Loading Image</p><LoadingSpinner /></div>}
-      <div className="relative flex flex-col items-center p-5">
+      <div className="relative flex flex-col items-center pr-5 pl-5 pb-2 pt-5">
         <div className="max-w-3xl">
           <Canvas size={imageSize} image={previewImageSrc} selectedArr={selectedArr} setSelectedArr={setSelectedArr} />
           <img hidden={!previewImageSrc} ref={image_ref} src={previewImageSrc} alt="" />
