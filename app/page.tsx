@@ -89,7 +89,6 @@ export default function Home() {
   useEffect(() => {
     window.addEventListener('resize', update_canvas_size);
     return () => window.removeEventListener("resize", update_canvas_size);
-
   }, [])
 
   useEffect(() => {
@@ -136,8 +135,8 @@ export default function Home() {
     const img_points = selectedArr.map((point, index) => {
       const zone = index;
       return {
-        x: Math.round((point.x / imageSize.x) * originalImageSize.x) - (2000 * zone),
-        y: Math.round((point.y / imageSize.y) * originalImageSize.y)
+        x: Math.round((point.x / (imageSize.x * 4)) * originalImageSize.x) - (2000 * zone),
+        y: Math.round((point.y / (imageSize.y * 4)) * originalImageSize.y)
       }
     })
     const send_data = {
@@ -147,7 +146,7 @@ export default function Home() {
       // @ts-ignore
       formData?.append(item, JSON.stringify(send_data[item]))
     }
-    fetch("https://images.mikaco.de/api/gif",{
+    fetch("http://localhost:9999/api/gif",{ //https://images.mikaco.de/api/gif
       method: "POST",
       body: formData
     }).then((res) => res.blob())
