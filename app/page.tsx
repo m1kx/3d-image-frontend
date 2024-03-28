@@ -146,7 +146,7 @@ export default function Home() {
       // @ts-ignore
       formData?.append(item, JSON.stringify(send_data[item]))
     }
-    fetch("http://localhost:9999/api/gif",{ //https://images.mikaco.de/api/gif
+    fetch("https://images.mikaco.de/api/gif", {
       method: "POST",
       body: formData
     }).then((res) => res.blob())
