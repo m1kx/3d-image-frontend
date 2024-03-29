@@ -135,8 +135,8 @@ export default function Home() {
     const img_points = selectedArr.map((point, index) => {
       const zone = index;
       return {
-        x: Math.round((point.x / (imageSize.x * 4)) * originalImageSize.x) - (2000 * zone),
-        y: Math.round((point.y / (imageSize.y * 4)) * originalImageSize.y)
+        x: Math.round(((point.x / (imageSize.x * 4)) * originalImageSize.x) - ((originalImageSize.x / 3) * zone)),
+        y: Math.round(((point.y / (imageSize.y * 4)) * originalImageSize.y))
       }
     })
     const send_data = {
