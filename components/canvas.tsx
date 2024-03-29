@@ -68,12 +68,12 @@ export function Canvas(props: CanvasProps) {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for (const point of props.selectedArr) {
       if (point.x == -1 || point.y == -1) continue;
-      const image_size = 25;
+      const image_size = 18;
       ctx.beginPath();
       ctx.moveTo(point.x / 4 - image_size / 4, point.y / 4 - image_size / 4);
       ctx.lineTo(point.x / 4 + image_size / 4, point.y / 4 - image_size / 4);
       ctx.lineTo(point.x / 4, point.y / 4);
-      ctx.fillStyle = '#ff0002';
+      ctx.fillStyle = '#00ff00';
       ctx.fill();
     }
   }, [props.selectedArr])
@@ -92,8 +92,8 @@ export function Canvas(props: CanvasProps) {
     const touch_location = event.targetTouches[0]; 
     setMousePos(prevMousePos => {
       return {
-        x: prevMousePos.x + (touchStartPos.x - touch_location.pageX) * 0.3,
-        y: prevMousePos.y + (touchStartPos.y - touch_location.pageY) * 0.3
+        x: prevMousePos.x + (touchStartPos.x - touch_location.pageX) * 0.3 * (1/zoomFactor),
+        y: prevMousePos.y + (touchStartPos.y - touch_location.pageY) * 0.3 * (1/zoomFactor)
       }
     })
     setTouchStartPos({
@@ -102,10 +102,28 @@ export function Canvas(props: CanvasProps) {
     })
   }
 
+  useEffect(() => {
+    document.body.onkeydown = (e: KeyboardEvent) => {
+      if (e.key == 'ArrowLeft')
+        setMousePos({x: --mousePos.x, y: mousePos.y});
+      if (e.key == 'ArrowRight')
+        setMousePos({x: ++mousePos.x, y: mousePos.y});
+      if (e.key == 'ArrowUp')
+        setMousePos({x: mousePos.x, y: --mousePos.y});
+      if (e.key == 'ArrowDown')
+        setMousePos({x: mousePos.x, y: ++mousePos.y});
+      if (e.key == 'Enter') {
+        if (canvas_ref.current == null) return;
+        click(mousePos, canvas_ref.current)
+      }
+    };
+  }, [click, mousePos, mousePos.x, mousePos.y]);
+
   return (
     <>
       {(canvas_ref.current && props.image != '') && <div className="pb-3 flex justify-center items-center flex-col">
         Preview Zoom Factor: <b>{zoomFactor}</b>
+        ({mousePos.x},{mousePos.y})
         <Slider defaultValue={[1]}
           max={15}
           min={0.25}
@@ -113,14 +131,13 @@ export function Canvas(props: CanvasProps) {
           className={cn("w-[100%] p-4")}
           onValueChange={(value: number[]) => {setZoomFactor(value[0])}}
         />
-        <div className="text-sm max-w-40 text-gray-500 p-1">{(mousePos.x + mousePos.y == 0) ? "select point to see zoomed preview" : `(${mousePos.x.toFixed(0)}, ${mousePos.y.toFixed(0)})`}</div>
         <div className="w-60 h-60 overflow-hidden relative rounded-md touch-none" ref={preview_window_ref} onTouchStart={touch_start} onTouchMove={touch_move}>
           <div className="absolute flex justify-center items-center size-full z-30" >
             <X size={25} />
           </div>
           <img className="absolute z-10" style={{minWidth: `${props.size.x * 4 * zoomFactor}px`, height: `${props.size.y * 4 * zoomFactor}px`, top: `${(-mousePos.y * zoomFactor + 120).toFixed(0)}px`, left: `${(-mousePos.x * zoomFactor + 120).toFixed(0)}px`}} src={props.image} alt="" />
         </div>
-        {touchStartPos.x != -1 && <Button className="m-2 w-60" onClick={() => click({x: Math.round(mousePos.x), y: Math.round(mousePos.y)}, canvas_ref.current as HTMLCanvasElement)}>SET POINT</Button>}
+        {touchStartPos.x != -1 && <Button className="m-2 w-60" variant="outline" onClick={() => click({x: Math.round(mousePos.x), y: Math.round(mousePos.y)}, canvas_ref.current as HTMLCanvasElement)}>SET POINT</Button>}
       </div>}
       {props.size.x != 0 &&
       <div className="grid grid-cols-3 w-full">
