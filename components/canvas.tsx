@@ -123,7 +123,6 @@ export function Canvas(props: CanvasProps) {
     <>
       {(canvas_ref.current && props.image != '') && <div className="pb-3 flex justify-center items-center flex-col">
         Preview Zoom Factor: <b>{zoomFactor}</b>
-        ({mousePos.x},{mousePos.y})
         <Slider defaultValue={[1]}
           max={15}
           min={0.25}
