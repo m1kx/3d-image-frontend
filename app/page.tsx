@@ -1,9 +1,11 @@
 'use client';
 
+import ArrowDown from '@/components/arrdown';
 import { Canvas } from '@/components/canvas';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 type Vec2 = {
@@ -177,7 +179,11 @@ export default function Home() {
   if (loadingResultGif != null && loadingResultGif)
     return (
       <div className="flex h-dvh w-dvw flex-col items-center justify-center">
-        <p className="p-5">Creating GIF</p>
+        <p className="p-5 text-center">
+          Creating gif...
+          <br />
+          This will take up to 20 seconds!
+        </p>
         <LoadingSpinner />
       </div>
     );
@@ -197,7 +203,36 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-start p-5">
       <div className="w-auto">
         {!loading && previewImageSrc == '' && (
-          <Input type="file" onChange={(e) => setEvent(e)} />
+          <>
+            <Input type="file" onChange={(e) => setEvent(e)} />
+            <div className="flex justify-center p-10 text-center text-gray-400">
+              <p className="max-w-80">
+                Convert your 3d images to gifs without time-consuming offsetting
+                in photoshop!
+                <br />
+                <br />
+                Get started by uploading the source image
+              </p>
+            </div>
+            <div className="flex flex-col items-center justify-center text-gray-500">
+              <div className="p-2">Example:</div>
+              <Image
+                width={500}
+                height={100}
+                alt="plants"
+                src={'/plants.jpg'}
+              ></Image>
+              <div className="p-5 opacity-30">
+                <ArrowDown size={50} />
+              </div>
+              <Image
+                width={150}
+                height={100}
+                alt="plants"
+                src={'/plants.gif'}
+              ></Image>
+            </div>
+          </>
         )}
       </div>
       {loading && (
@@ -233,7 +268,7 @@ export default function Home() {
         </div>
       </div>
       {selectedArr.filter((elem) => elem.x != -1).length == 3 && (
-        <div className="w-full max-w-3xl pl-5 pr-5">
+        <div className="w-full max-w-3xl pl-5 pr-5 pt-2">
           <Button className="w-full" onClick={() => run()}>
             CREATE GIF
           </Button>
