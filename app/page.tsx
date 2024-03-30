@@ -205,13 +205,23 @@ export default function Home() {
         {!loading && previewImageSrc == '' && (
           <>
             <Input type="file" onChange={(e) => setEvent(e)} />
-            <div className="flex justify-center p-10 text-center text-gray-400">
+            <div className="flex flex-col items-center justify-center gap-8 p-10 text-center text-gray-400">
               <p className="max-w-80">
                 Convert your 3d images to gifs without time-consuming offsetting
                 in photoshop!
                 <br />
                 <br />
                 Get started by uploading the source image
+              </p>
+              <p className="max-w-80 text-xs">
+                Thanks to{' '}
+                <a
+                  href="https://www.printables.com/@AlexFiel_408766"
+                  className="text-blue-300"
+                >
+                  @AlexFiel
+                </a>{' '}
+                for the great Wigglegram Lens for Sony E-Mount!!!
               </p>
             </div>
             <div className="flex flex-col items-center justify-center text-gray-500">
