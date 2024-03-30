@@ -1,33 +1,33 @@
-"use client"
+'use client';
 
-import { Canvas } from "@/components/canvas";
-import LoadingSpinner from "@/components/loading-spinner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Canvas } from '@/components/canvas';
+import LoadingSpinner from '@/components/loading-spinner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 type Vec2 = {
   x: number;
   y: number;
-}
+};
 
 const file_upload = (e: ChangeEvent<HTMLInputElement>) => {
-
   const img_size: Vec2 = {
-    x: 0, y:0
-  }
+    x: 0,
+    y: 0,
+  };
   const form_data: FormData = new FormData();
   const reader: FileReader = new FileReader();
 
   const input: HTMLInputElement = e.target;
-  console.log(input.files)
+  console.log(input.files);
   if (!input.files) {
     // ERR
     return {
-    form_data,
-    img_size,
-    reader
-  }
+      form_data,
+      img_size,
+      reader,
+    };
   }
   const file: File = input.files[0];
   if (!file) {
@@ -35,22 +35,19 @@ const file_upload = (e: ChangeEvent<HTMLInputElement>) => {
     return {
       form_data,
       img_size,
-      reader
-    }
+      reader,
+    };
   }
 
-  
   reader.readAsDataURL(file);
-  form_data.append("image", file);
+  form_data.append('image', file);
 
   return {
     form_data,
     img_size,
-    reader
-  }
-
-  
-}
+    reader,
+  };
+};
 
 const download_gif = (url: string) => {
   const a = document.createElement('a');
@@ -59,37 +56,44 @@ const download_gif = (url: string) => {
   a.download = 'result.gif';
   document.body.appendChild(a);
   a.click();
-}
+};
 
 const get_zone = (size: Vec2, point: Vec2) => {
-  return (point.x < size.x / 3) ? 0 : (point.x < (size.x / 3) * 2) ? 1 : 2;
-}
+  return point.x < size.x / 3 ? 0 : point.x < (size.x / 3) * 2 ? 1 : 2;
+};
 
 export default function Home() {
   let [event, setEvent] = useState<ChangeEvent<HTMLInputElement>>();
-  let [previewImageSrc, setPreviewImageSrc] = useState<string>("");
+  let [previewImageSrc, setPreviewImageSrc] = useState<string>('');
   let [loading, setLoading] = useState(false);
-  let [imageSize, setImageSize] = useState<Vec2>({x:0,y:0});
-  let [originalImageSize, setOriginalImageSize] = useState<Vec2>({x:0,y:0});
-  let [selectedArr, setSelectedArr] = useState<Vec2[]>([{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}]);
+  let [imageSize, setImageSize] = useState<Vec2>({ x: 0, y: 0 });
+  let [originalImageSize, setOriginalImageSize] = useState<Vec2>({
+    x: 0,
+    y: 0,
+  });
+  let [selectedArr, setSelectedArr] = useState<Vec2[]>([
+    { x: -1, y: -1 },
+    { x: -1, y: -1 },
+    { x: -1, y: -1 },
+  ]);
   let [formData, setFormData] = useState<FormData>();
 
-  let [resultGif, setResultGif] = useState<string>("");
+  let [resultGif, setResultGif] = useState<string>('');
   let [loadingResultGif, setLoadingResultGif] = useState<boolean | null>(null);
 
   const image_ref = useRef<HTMLImageElement>(null);
 
   const update_canvas_size = () => {
     setImageSize({
-      x: (image_ref.current)? image_ref.current.width : 0,
-      y: (image_ref.current)? image_ref.current.height : 0
-    })
-  }
+      x: image_ref.current ? image_ref.current.width : 0,
+      y: image_ref.current ? image_ref.current.height : 0,
+    });
+  };
 
   useEffect(() => {
     window.addEventListener('resize', update_canvas_size);
-    return () => window.removeEventListener("resize", update_canvas_size);
-  }, [])
+    return () => window.removeEventListener('resize', update_canvas_size);
+  }, []);
 
   useEffect(() => {
     if (!event) return;
@@ -113,74 +117,128 @@ export default function Home() {
 
       image_ref.current.onload = () => {
         setOriginalImageSize({
-          x: (image_ref.current) ? image_ref.current.naturalWidth : 0,
-          y: (image_ref.current) ? image_ref.current.naturalHeight : 0
+          x: image_ref.current ? image_ref.current.naturalWidth : 0,
+          y: image_ref.current ? image_ref.current.naturalHeight : 0,
         });
         setImageSize({
-          x: (image_ref.current) ? image_ref.current.width : 0,
-          y: (image_ref.current) ? image_ref.current.height : 0
-        })
-      }
-      if (previewImageSrc != "") {
-        setSelectedArr([{x:-1,y:-1},{x:-1,y:-1},{x:-1,y:-1}])
+          x: image_ref.current ? image_ref.current.width : 0,
+          y: image_ref.current ? image_ref.current.height : 0,
+        });
+      };
+      if (previewImageSrc != '') {
+        setSelectedArr([
+          { x: -1, y: -1 },
+          { x: -1, y: -1 },
+          { x: -1, y: -1 },
+        ]);
       }
       setPreviewImageSrc(reader.result as string);
-    }
-  }, [event])
+    };
+  }, [event]);
 
   const run = () => {
-    setLoadingResultGif(prev => {
-      return true
+    setLoadingResultGif((prev) => {
+      return true;
     });
     const img_points = selectedArr.map((point, index) => {
       const zone = index;
       return {
-        x: Math.round(((point.x / (imageSize.x * 4)) * originalImageSize.x) - ((originalImageSize.x / 3) * zone)),
-        y: Math.round(((point.y / (imageSize.y * 4)) * originalImageSize.y))
-      }
-    })
+        x: Math.round(
+          (point.x / (imageSize.x * 4)) * originalImageSize.x -
+            (originalImageSize.x / 3) * zone,
+        ),
+        y: Math.round((point.y / (imageSize.y * 4)) * originalImageSize.y),
+      };
+    });
     const send_data = {
-      points: img_points
-    }
+      points: img_points,
+    };
     for (const item in send_data) {
       // @ts-ignore
-      formData?.append(item, JSON.stringify(send_data[item]))
+      formData?.append(item, JSON.stringify(send_data[item]));
     }
-    fetch("https://images.mikaco.de/api/gif", {
-      method: "POST",
-      body: formData
-    }).then((res) => res.blob())
+    fetch('https://images.mikaco.de/api/gif', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.blob())
       .then((data) => {
-        const url = URL.createObjectURL(data)
-        setResultGif(url)
-        setLoadingResultGif(prev => {
-          return false
-        })
-      }).then(() => {
-        console.log(resultGif)
+        const url = URL.createObjectURL(data);
+        setResultGif(url);
+        setLoadingResultGif((prev) => {
+          return false;
+        });
       })
-  }
-  
-  if (loadingResultGif != null && loadingResultGif) return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Creating GIF</p><LoadingSpinner /></div>
-  if (resultGif != "") return <div className="h-dvh w-dvw flex justify-center items-center flex-col"><img className="h-full" alt="x" src={resultGif}></img><div className="absolute bottom-0 p-3 w-full"><Button onClick={() => download_gif(resultGif)} className="w-full">DOWNLOAD</Button></div></div>
+      .then(() => {
+        console.log(resultGif);
+      });
+  };
+
+  if (loadingResultGif != null && loadingResultGif)
+    return (
+      <div className="flex h-dvh w-dvw flex-col items-center justify-center">
+        <p className="p-5">Creating GIF</p>
+        <LoadingSpinner />
+      </div>
+    );
+  if (resultGif != '')
+    return (
+      <div className="flex h-dvh w-dvw flex-col items-center justify-center">
+        <img className="h-full" alt="x" src={resultGif}></img>
+        <div className="absolute bottom-0 w-full p-3">
+          <Button onClick={() => download_gif(resultGif)} className="w-full">
+            DOWNLOAD
+          </Button>
+        </div>
+      </div>
+    );
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-5">
       <div className="w-auto">
-        {(!loading && previewImageSrc == "") &&<Input type="file" onChange={(e) => setEvent(e)} />}
+        {!loading && previewImageSrc == '' && (
+          <Input type="file" onChange={(e) => setEvent(e)} />
+        )}
       </div>
-      {loading && <div className="h-dvh w-dvw flex justify-center items-center flex-col"><p className="p-5">Loading Image</p><LoadingSpinner /></div>}
-      <div className="relative flex flex-col items-center pr-5 pl-5 pb-2 pt-5">
+      {loading && (
+        <div className="flex h-dvh w-dvw flex-col items-center justify-center">
+          <p className="p-5">Loading Image</p>
+          <LoadingSpinner />
+        </div>
+      )}
+      <div className="relative flex flex-col items-center pb-2 pl-5 pr-5 pt-5">
         <div className="max-w-3xl">
-          <Canvas size={imageSize} image={previewImageSrc} selectedArr={selectedArr} setSelectedArr={setSelectedArr} />
-          <img hidden={!previewImageSrc} ref={image_ref} src={previewImageSrc} alt="" />
+          <Canvas
+            size={imageSize}
+            image={previewImageSrc}
+            selectedArr={selectedArr}
+            setSelectedArr={setSelectedArr}
+          />
+          <img
+            hidden={!previewImageSrc}
+            ref={image_ref}
+            src={previewImageSrc}
+            alt=""
+          />
+          <div
+            hidden={!previewImageSrc}
+            className="w-full pt-4 text-center text-xs text-gray-600	"
+          >
+            Tipp:
+            <br /> <b>on pc</b> - use arrow keys and enter to move around and
+            set points.
+            <br /> <b>on mobile</b> - swipe in the preview image above to set
+            points
+          </div>
         </div>
       </div>
-      {selectedArr.filter((elem) => elem.x != -1).length == 3 &&
-        <div className="w-full max-w-3xl pr-5 pl-5">
-          <Button className="w-full" onClick={() => run()}>CREATE GIF</Button>
+      {selectedArr.filter((elem) => elem.x != -1).length == 3 && (
+        <div className="w-full max-w-3xl pl-5 pr-5">
+          <Button className="w-full" onClick={() => run()}>
+            CREATE GIF
+          </Button>
         </div>
-      }
+      )}
     </main>
   );
 }
