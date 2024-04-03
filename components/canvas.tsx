@@ -2,9 +2,9 @@
 
 import { cn } from '@/lib/utils';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import X from './icons/x';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
-import X from './x';
 
 export type Vec2 = {
   x: number;

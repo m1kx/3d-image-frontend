@@ -2,6 +2,8 @@
 
 import ArrowDown from '@/components/arrdown';
 import { Canvas } from '@/components/canvas';
+import Github from '@/components/icons/github';
+import Instagram from '@/components/icons/instagram';
 import LoadingSpinner from '@/components/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -107,16 +109,6 @@ export default function Home() {
     reader.onload = (e: ProgressEvent<FileReader>) => {
       setLoading(false);
       if (!image_ref || !image_ref.current) return;
-
-      /*const img_temp = new HTMLImageElement();
-      img_temp.onload = () => {
-        setOriginalImageSize({
-          x: img_temp.width,
-          y: img_temp.height
-        });
-      }
-      img_temp.src = reader.result as string;*/
-
       image_ref.current.onload = () => {
         setOriginalImageSize({
           x: image_ref.current ? image_ref.current.naturalWidth : 0,
@@ -224,7 +216,23 @@ export default function Home() {
                 for the great Wigglegram Lens for Sony E-Mount!!!
               </p>
             </div>
-            <div className="flex flex-col items-center justify-center text-gray-500">
+            <div className="flex w-full items-center justify-center gap-3">
+              <div
+                className="cursor-pointer transition-opacity hover:opacity-50"
+                onClick={() => window.open('https://www.instagram.com/mik4.go')}
+              >
+                <Instagram size={25} />
+              </div>
+              <div
+                className="cursor-pointer transition-opacity hover:opacity-50"
+                onClick={() =>
+                  window.open('https://github.com/m1kx/3d-image-frontend')
+                }
+              >
+                <Github size={25} />
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-center pt-4 text-gray-500">
               <div className="p-2">Example:</div>
               <Image
                 width={500}
