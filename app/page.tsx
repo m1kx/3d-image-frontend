@@ -5,6 +5,14 @@ import { Canvas } from '@/components/canvas';
 import Github from '@/components/icons/github';
 import Instagram from '@/components/icons/instagram';
 import LoadingSpinner from '@/components/loading-spinner';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
@@ -81,6 +89,7 @@ export default function Home() {
     { x: -1, y: -1 },
   ]);
   let [formData, setFormData] = useState<FormData>();
+  let [error, setError] = useState<boolean>(false);
 
   let [resultGif, setResultGif] = useState<string>('');
   let [loadingResultGif, setLoadingResultGif] = useState<boolean | null>(null);
@@ -130,7 +139,7 @@ export default function Home() {
     };
   }, [event]);
 
-  const run = () => {
+  const run = async () => {
     setLoadingResultGif((prev) => {
       return true;
     });
@@ -151,21 +160,25 @@ export default function Home() {
       // @ts-ignore
       formData?.append(item, JSON.stringify(send_data[item]));
     }
-    fetch('https://images.mikaco.de/api/gif', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((res) => res.blob())
-      .then((data) => {
-        const url = URL.createObjectURL(data);
-        setResultGif(url);
-        setLoadingResultGif((prev) => {
-          return false;
-        });
-      })
-      .then(() => {
-        console.log(resultGif);
+    try {
+      const res = await fetch('https://images.mikaco.de/api/gif', {
+        method: 'POST',
+        body: formData,
       });
+      if (!res.ok) {
+        throw new Error('');
+      }
+      const data = await res.blob();
+      const url = URL.createObjectURL(data);
+      setResultGif(url);
+      setLoadingResultGif((prev) => {
+        return false;
+      });
+    } catch (error) {
+      console.log('error');
+      setLoadingResultGif(false);
+      setError(true);
+    }
   };
 
   if (loadingResultGif != null && loadingResultGif)
@@ -292,6 +305,26 @@ export default function Home() {
           </Button>
         </div>
       )}
+      <AlertDialog open={error}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Error</AlertDialogTitle>
+            <AlertDialogDescription>
+              There was an error during the creation of the gif. Please try
+              again later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Restart
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
